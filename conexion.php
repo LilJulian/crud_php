@@ -29,6 +29,6 @@ function getConexion()
 
 function cerrarConexion()
 {
-    $this->conexion =null;
+    $this->conexion =null;  
 }
 }

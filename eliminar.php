@@ -8,7 +8,7 @@
         $conexion = $db->getConexion();
     
 
-        $sql = "DELETE FROM usuarios WHERE id_usuario > 2";
+        $sql = "DELETE FROM usuarios WHERE id_usuario = id_usuario";
         $stm = $conexion->prepare($sql);
         $stm->execute();
 

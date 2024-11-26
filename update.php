@@ -1,9 +1,16 @@
 <?php
-
 require('conexion.php');
 
 $db = new Conexion();
 $conexion = $db->getConexion();
+
+
+
+
+$consulta_usuario = "SELECT id_usuario, nombre, apellido, correo, fecha_nacimiento, generos.nombre_genero AS genero, ciudades.nombre_ciudad AS ciudad FROM usuarios inner join generos on usuarios.id_genero = generos.id_genero inner join ciudades on usuarios.id_ciudad = ciudades.id_ciudad";
+$bdera = $conexion->prepare($consulta_usuario);
+$bdera->execute();
+$usuarios = $bdera->fetchAll(); 
 
 $sql = "SELECT * FROM ciudades";
 $bandera = $conexion->prepare($sql);
@@ -20,11 +27,21 @@ $bnadera = $conexion->prepare($consulta_len);
 $bnadera->execute(); 
 $lenguajes = $bnadera->fetchAll();
 
-
+$actualizacion = "UPDATE usuarios SET 
+nombre = nombre,
+apellido = apellido,
+correo = correo,
+fecha_nacimiento = fecha_nacimiento,
+id_genero = id_genero,
+id_ciudad = id_ciudad
+where id_usuario = id_usuario
+";
+$stm = $conexion->prepare($actualizacion);
+$usuarios = $stm->fetchAll();
+$stm->execute();
 
 
 ?>
-
 <form action="controlador.php" method="post" class="formulario">
     <style>
         *{
