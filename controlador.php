@@ -64,6 +64,8 @@ $stm->execute();
         <th>fecha_nacimiento</th >
         <th>genero</th >
         <th>ciudad</th >
+        <th>Editar</th>
+        <th>Eliminar</th>
     </tr>
     <?php
     foreach($usuarios as $key =>$value){
@@ -99,16 +101,50 @@ $stm->execute();
             <?= $value['ciudad']?>
         </td>
         <td>
-            <input type="text" name="id_usuario" value="<?=$value['id_usuario']?>">
-            <form action="update.php">
-            <button>Editar</button>
-            </form>
-            <form action="eliminar.php">
-            <button type="submit">Eliminar</button>
-        </form>
+            <a href="update.php?id_usuario=<?= $value['id_usuario']?>">Editar</a>
+        </td>
+        <td>
+            <a  href="eliminar_usu.php?id_usuario=<?= $value['id_usuario']?>">Eliminar</a>
         </td>
         <?php
     }
     ?>        
     </tr>    
+</table>
+
+<?php
+$consulta_leng_usu =  "SELECT * FROM julian.lenguaje_usuario";
+$era = $conexion->prepare($consulta_leng_usu);
+$era -> execute();
+$leng_usu = $era->fetchAll();
+
+
+?>
+<table>
+    <style>
+        table{
+            border: 1px solid;
+        }
+        tr  td{
+            border: 1px solid;
+        }
+    </style>
+    <tr>
+        <th>id_usuario</th>
+        <th>id_lenguaje</th>
+    </tr>
+    <?php
+    foreach ($leng_usu as $key => $value){
+    ?>
+    <td>
+        <?= $value['id_usuario']?>
+    </td>
+    <td>
+        <?= $value['id_lenguaje']?>
+    </td>
+    <tr>
+    <?php
+    }
+    ?> 
+    </tr>
 </table>

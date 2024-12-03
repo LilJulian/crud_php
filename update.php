@@ -5,12 +5,10 @@ $db = new Conexion();
 $conexion = $db->getConexion();
 
 
-
-
-$consulta_usuario = "SELECT id_usuario, nombre, apellido, correo, fecha_nacimiento, generos.nombre_genero AS genero, ciudades.nombre_ciudad AS ciudad FROM usuarios inner join generos on usuarios.id_genero = generos.id_genero inner join ciudades on usuarios.id_ciudad = ciudades.id_ciudad";
-$bdera = $conexion->prepare($consulta_usuario);
-$bdera->execute();
-$usuarios = $bdera->fetchAll(); 
+// $consulta_usuario = "SELECT id_usuario, nombre, apellido, correo, fecha_nacimiento, generos.nombre_genero AS genero, ciudades.nombre_ciudad AS ciudad FROM usuarios inner join generos on usuarios.id_genero = generos.id_genero inner join ciudades on usuarios.id_ciudad = ciudades.id_ciudad";
+// $bdera = $conexion->prepare($consulta_usuario);
+// $bdera->execute();
+// $usuarios = $bdera->fetchAll(); 
 
 $sql = "SELECT * FROM ciudades";
 $bandera = $conexion->prepare($sql);
@@ -27,22 +25,31 @@ $bnadera = $conexion->prepare($consulta_len);
 $bnadera->execute(); 
 $lenguajes = $bnadera->fetchAll();
 
-$actualizacion = "UPDATE usuarios SET 
-nombre = nombre,
-apellido = apellido,
-correo = correo,
-fecha_nacimiento = fecha_nacimiento,
-id_genero = id_genero,
-id_ciudad = id_ciudad
-where id_usuario = id_usuario
-";
-$stm = $conexion->prepare($actualizacion);
-$usuarios = $stm->fetchAll();
-$stm->execute();
+$id_usuario = $_GET['id_usuario'];
 
+$sql = "SELECT * FROM usuarios WHERE id_usuario = :id";
+$stm = $conexion->prepare($sql);
+$stm->bindParam(':id', $id_usuario);
+$stm->execute();
+$usuario = $stm->fetch();
+
+
+
+$sql = "SELECT id_lenguaje FROM lenguaje_usuario WHERE id_usuario = :id_lenguaje";
+$stm = $conexion->prepare($sql);
+$stm->bindParam(':id_lenguaje', $id_usuario);
+$stm -> execute();
+$lenguaje_usu = $stm->fetchAll();
+$lenguajesArray = [];
+foreach ($lenguaje_usu as $key => $value) {
+    $lenguajesArray[] = $value['id_lenguaje'];
+}
+// echo $lenguaje_usu;
+
+// print_r($lenguajesArray);
 
 ?>
-<form action="controlador.php" method="post" class="formulario">
+<form action="actualizado.php" method="post" class="formulario">
     <style>
         *{
             margin: 0;
@@ -69,23 +76,26 @@ $stm->execute();
     </style>
     <div>
         <div>
+            <input type="hidden" name="id_usuario" value="<?=$id_usuario?>">
+        </div>
+        <div>
             <label for="nombre">Nombres</label>
-            <input type="text" name="nombre">
+            <input type="text" name="nombre" value="<?=$usuario['nombre']?>">
         </div>
         <br>
         <div>
             <label for="apellido">Apellidos</label>
-            <input type="text" name="apellido">
+            <input type="text" name="apellido" value="<?=$usuario['apellido']?>">
         </div>
         <br>
         <div>
             <label for="correo">Correo</label>
-            <input type="text" name="correo">
+            <input type="text" name="correo" value="<?=$usuario['correo']?>">
         </div>
         <br>
         <div>
             <label for="nacimiento">Fecha de nacimiento</label>
-            <input type="date" name="fecha_nacimiento">
+            <input type="date" name="fecha_nacimiento" value="<?=$usuario['fecha_nacimiento']?>">
         </div>
         <br>
         <label for="id_ciudad">Ciudad</label >
@@ -93,7 +103,15 @@ $stm->execute();
             <?php
             foreach ($ciudades as $key => $value) {
                 ?>
-                <option name="id_ciudad" value="<?= $value['id_ciudad']?>"><?= $value['nombre_ciudad']?>
+                <option name="id_ciudad" value="<?= $value['id_ciudad']?>"
+                <?php 
+                if ($value['id_ciudad'] === $usuario['id_ciudad']) {
+                    ?>
+                    selected
+                    <?php
+                }?>
+                >
+                    <?= $value['nombre_ciudad']?>
                 </option>
             <?php
             }
@@ -107,7 +125,16 @@ $stm->execute();
         ?>
             <div>
             <label for="genero<?= $value['id_genero'] ?>"><?= $value['nombre_genero']?>
-                <input type="radio" name="id_genero" value="<?= $value['id_genero']?>" id="genero<?= $value['id_genero']?>">
+                <input type="radio" name="id_genero" value="<?= $value['id_genero']?>" id="genero<?= $value['id_genero']?>"
+                <?php
+                if ($value['id_genero'] === $usuario['id_genero']) {
+                    ?>
+                    checked
+                    <?php
+                }
+                ?>
+                >
+                
             </label>
             </div>
             <?php
@@ -121,7 +148,15 @@ $stm->execute();
         ?>
             <div>
                 <label for="lenguaje<?= $value['id_lenguaje'] ?>"><?= $value['nombre']?>
-                <input type="checkbox" name="id_lenguaje[]" value="<?= $value['id_lenguaje']?>" id="lenguaje<?= $value['id_lenguaje']?>">
+                <input type="checkbox" name="id_lenguaje[]" value="<?= $value['id_lenguaje']?>" id="lenguaje<?= $value['id_lenguaje']?>"
+                <?php
+                if (in_array($value['id_lenguaje'], $lenguajesArray)) {
+                    ?>
+                    checked
+                    <?php
+                }
+                ?>
+                >
                 </label>
             </div>
         <?php    
